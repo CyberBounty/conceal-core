@@ -8,7 +8,7 @@
 #include "P2pNode.h"
 
 #include <boost/uuid/uuid_io.hpp>
-
+#include <random>
 #include <System/ContextGroupTimeout.h>
 #include <System/InterruptedException.h>
 #include <System/Ipv4Address.h>
@@ -28,7 +28,7 @@
 #include "P2pContextOwner.h"
 #include "P2pNetworks.h"
 
-using namespace Common;
+    using namespace Common;
 using namespace Logging;
 using namespace System;
 
@@ -229,7 +229,11 @@ void P2pNode::connectPeers() {
   // if white peer list is empty, get peers from seeds
   if (m_peerlist.get_white_peers_count() == 0 && !m_cfg.getSeedNodes().empty()) {
     auto seedNodes = m_cfg.getSeedNodes();
-    std::random_shuffle(seedNodes.begin(), seedNodes.end());
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(seedNodes.begin(), seedNodes.end(),g);
     for (const auto& seed : seedNodes) {
       auto conn = tryToConnectPeer(seed);
       if (conn != nullptr && fetchPeerList(std::move(conn))) {
